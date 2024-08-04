@@ -16,6 +16,16 @@ void printArr(int arr[], int size)
     }
     cout << endl;
 }
+
+void printVec(vector<int> vec, int size)
+{
+    for (int i = 0; i < size; i++)
+    {
+        cout << vec[i] << " ";
+    }
+    cout << endl;
+}
+
 //swap function
 void swapNumbers(int& a, int& b)
 {
@@ -188,7 +198,6 @@ int findPivotGPT(vector<int>& nums)
     return start;
 }
 
-
 int findPivot(vector<int>& nums)
 {
     int start = 0;
@@ -243,6 +252,24 @@ int binarySearchInRotated(vector<int>& nums, int& s, int& e, int &target)
     return -1;
 }
 
+void solve(vector<char>& s, int& i, int& j)
+{
+    if (i > j)
+        return;
+    swap(s[i], s[j]);
+    i++;
+    j--;
+    solve(s, i, j);
+}
+//rotate array
+void rotate(vector<int>& nums, int k) {
+    vector<int> temp(nums.size());
+    for (int i = 0; i < nums.size(); i++)
+    {
+        temp[(i + k) % nums.size()] = nums[i];
+    }
+    nums = temp;
+}
 int main()
 {
     /*
@@ -301,9 +328,9 @@ int main()
     }
     */
 
-    //find duplicate for 0 to n-1 in which 1 to n-1 is present. Only one number is repeated.
-
+    
     /*
+    //find duplicate for 0 to n-1 in which 1 to n-1 is present. Only one number is repeated.
     int arr[] = {2,5,4,1,3,4};
     int res = 0;
     for (int i = 0; i < 6; i++)
@@ -461,8 +488,9 @@ int main()
         cout << res << endl;
         */
 
-    
+    /*
     vector<int> nums = { 1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,1,1};
+    //for duplicate elements like above use linear search
     int pIndex = findPivotGPT(nums);
     int start = 0;
     int end = nums.size() - 1;
@@ -475,7 +503,39 @@ int main()
    
     cout << target << " found at: " << foundIndex << endl;
    
+   */
 
+    /*
+    //solve all binary search problem with recurrsion
+    vector<char> s = { 's','a','g','a','r'};
+    int i = 0;
+    int j = s.size()-1;
+    solve(s, i, j);
+    for (int i = 0; i < s.size(); i++)
+    {
+        cout << s[i] << " ";
+    }
+    */
+    
+    /*
+    //rotate array by using moduls logic. Use % for cyclic
+    vector<int> nums = {1,2,3,4,5};
+    int k = 2;
+    rotate(nums, 2);
+    printVec(nums);
+    */
+    
+    // solve sieve of eratosthenes
+
+    //gcd
+    int a = 72;
+    int b = 24;
+    if (a == 0) return b;
+    if (b == 0) return a;
+    while (a!=b)
+    {
+        if (a > b) a = a - b;
+        if (a < b) b = b - a;
+    }
+    cout << a;
 }
-
-
