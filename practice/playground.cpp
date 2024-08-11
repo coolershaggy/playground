@@ -538,4 +538,14 @@ int main()
         if (a < b) b = b - a;
     }
     cout << a;
+    
+    //hw for Basic Math for DSA
+    //piegon hole
+    //catalon number
+    //inclusion exclusion principle
+    //factorial of large using mod 10^9
+    //GCD reference: https://www.codingninjas.com/blog/202... 
+    //Modular Arithmetics Reference : https://codeforces.com/blog/entry/72527 
+
+
 }
