@@ -303,3 +303,146 @@ int Array::findPivot(vector<int>& nums) {
 	cout << "Pivot: " <<mid << endl;
 	return mid;
 }
+
+
+bool Array::searchMatrix(vector<vector<int>>& matrix, int target) {
+	int row = matrix.size(); // row size
+	int col = matrix[0].size(); //col size 
+	int start = 0;
+	int end = row * col - 1;	//make sure to -1 if starting from 0
+	int mid = start + (end - start) / 2; //to handle case of big numbers addition
+
+	while (start <= end)
+	{
+		//mid is represented by matrix[i][j] -> matrix[mid/col][mid%col]
+		//divide by col gives row number and mod(%) by col gives col number for any element in 2d array
+		if (matrix[mid / col][mid % col] == target) {
+			return true;
+		}
+		else if (target > matrix[mid / col][mid % col]) {
+			start = mid + 1;
+		}
+		else {
+			end = mid - 1;
+		}
+		mid = start + (end - start) / 2;
+	}
+	return false;
+
+}
+
+vector<int> Array::spiralOrder(vector<vector<int>>& matrix) {
+	int m = matrix.size();
+	int n = matrix[0].size();
+	int count = 0;
+	int total = m * n;
+
+	int startRowIndex = 0;
+	int startColIndex = 0;
+	int endColIndex = n - 1;
+	int endRowIndex = m - 1;
+
+	vector<int> answer;
+
+	while (count < total)
+	{
+		//for all loops check this condition before entering in loop "&& count < total"
+
+
+		//print starting row from left to right
+		for (int index = startColIndex; index <= endColIndex && count < total; index++)
+		{
+			answer.push_back(matrix[startRowIndex][index]);
+			count++;
+		}
+		//increment starting row
+		startRowIndex++;
+
+		//print ending col from top to bottom
+		for (int index = startRowIndex; index <= endRowIndex && count < total; index++)
+		{
+			answer.push_back(matrix[index][endColIndex]);
+			count++;
+		}
+		//decrement ending col
+		endColIndex--;
+
+		//print ending row from right to left
+		for (int index = endColIndex; index >= startColIndex && count < total; index--)
+		{
+			answer.push_back(matrix[endRowIndex][index]);
+			count++;
+		}
+		//decrement ending row
+		endRowIndex--;
+
+		//print starting col from bottom to top
+		for (int index = endRowIndex; index >= startRowIndex && count < total; index--)
+		{
+			answer.push_back(matrix[index][startColIndex]);
+			count++;
+		}
+		//increment starting col
+		startColIndex++;
+
+	}
+	return answer;
+}
+
+vector<vector<int>> Array::generateMatrix(int n) {
+
+	int count = 1;
+	int nSquare = n * n;
+
+	int startRowIndex = 0;
+	int startColIndex = 0;
+	int endColIndex = n - 1;
+	int endRowIndex = n - 1;
+
+
+	vector<vector<int>> matrix(n, vector<int>(n, 0));
+
+	while (count <= nSquare)
+	{
+		//for all loops check this condition before entering in loop "&& count < total"
+
+
+		//print starting row from left to right
+		for (int index = startColIndex; index <= endColIndex && count <= nSquare; index++)
+		{
+			matrix[startRowIndex][index] = count;
+			count++;
+		}
+		//increment starting row
+		startRowIndex++;
+
+		//print ending col from top to bottom
+		for (int index = startRowIndex; index <= endRowIndex && count <= nSquare; index++)
+		{
+			matrix[index][endColIndex] = count;
+			count++;
+		}
+		//decrement ending col
+		endColIndex--;
+
+		//print ending row from right to left
+		for (int index = endColIndex; index >= startColIndex && count <= nSquare; index--)
+		{
+			matrix[endRowIndex][index] = count;
+			count++;
+		}
+		//decrement ending row
+		endRowIndex--;
+
+		//print starting col from bottom to top
+		for (int index = endRowIndex; index >= startRowIndex && count <= nSquare; index--)
+		{
+			matrix[index][startColIndex] = count;
+			count++;
+		}
+		//increment starting col
+		startColIndex++;
+
+	}
+	return matrix;
+}

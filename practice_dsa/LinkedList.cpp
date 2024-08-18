@@ -337,3 +337,47 @@ ListNode* LinkedList::addTwoNumbersGPT(ListNode* l1, ListNode* l2) {
 	return head; // Return the head of the result list
 }
 
+//slow and fast LL
+ListNode* LinkedList::middleNode(ListNode* head) {
+	// first approach -> to find the length of the array and then iterating till the mid of the LL
+	// TORTOISE AND HARE 
+	ListNode* slow = head;
+	ListNode* fast = head;
+	ListNode* mid = NULL;
+	while (fast != NULL && fast->next != NULL) {
+		mid = slow;
+		slow = slow->next;
+		fast = fast->next->next;
+	}
+	return slow;
+}
+
+ListNode* mergeInBetween(ListNode* list1, int a, int b, ListNode* list2) {
+	ListNode* l1 = list1;
+	ListNode* l2 = list2;
+	ListNode* start = NULL;
+	ListNode* end = NULL;
+	int count = 0;
+	while (l1 != NULL) {
+		if (count == a - 1) {
+			start = l1;
+		}
+		if (count == b + 1) {
+			end = l1;
+		}
+		count++;
+		l1 = l1->next;
+	}
+	if (start->next != NULL) {
+		start->next = list2;
+	}
+	while (l2->next != NULL) {
+		l2 = l2->next;
+	}
+
+	l2->next = end;
+
+
+
+	return list1;
+}

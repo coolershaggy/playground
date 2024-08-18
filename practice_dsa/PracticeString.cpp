@@ -71,6 +71,34 @@ char PracticeString::upparToLower(char& input)
 		return input - 'A' + 'a';
 	}
 }
+string PracticeString::upparToLower(string & input)
+{
+	// Iterate over each character in the input string
+	for (char& c : input) {
+		// If the character is uppercase, convert it to lowercase
+		if (c >= 'A' && c <= 'Z') {
+			c = std::tolower(static_cast<unsigned char>(c));
+		}
+	}
+	// Return the modified string
+	return input;
+}
+
+std::string PracticeString::removeNonAlphanumericAndToLower(std::string& input) {
+	std::string result;
+	// Iterate over each character in the input string
+	for (char c : input) {
+		// Check if the character is alphanumeric (i.e., a letter or digit)
+		if (std::isalnum(static_cast<unsigned char>(c))) {
+			// Convert the character to lowercase and add it to the result string
+			result += std::tolower(static_cast<unsigned char>(c));
+		}
+	}
+	// Return the modified string
+	return result;
+}
+
+
 
 int PracticeString::lengthOfLastWord(string& s) {
 
@@ -390,3 +418,28 @@ string PracticeString::removeDuplicates(string s) {
 	string result(vec.begin(), vec.end());
 	return result;
 }
+
+
+std::string PracticeString::longestCommonPrefix(const std::vector<std::string>& strs) {
+	if (strs.empty()) return ""; // Check for an empty array of strings
+
+	std::string prefix = strs[0]; // Start with the first string as the prefix
+
+	for (int i = 1; i < strs.size(); ++i) { // Iterate through the strings
+		int j = 0;
+		for (; j < prefix.length() && j < strs[i].length(); ++j) {
+			if (prefix[j] != strs[i][j]) {
+				break; // Stop at the first mismatch
+			}
+		}
+		prefix = prefix.substr(0, j); // Update the prefix
+		if (prefix.empty()) return ""; // No common prefix
+	}
+
+	return prefix; // Return the longest common prefix
+
+	//std::vector<std::string> strs = { "flower", "flow", "flight" };
+	//std::cout << "Longest common prefix: " << longestCommonPrefix(strs) << std::endl;
+}
+
+

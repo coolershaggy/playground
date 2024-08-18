@@ -23,5 +23,9 @@ public:
 	static int getEquilibrium(vector<int>& nums);
 	static int findPivot(vector<int>& nums);
 
+	static bool searchMatrix(vector<vector<int>>& matrix, int target);
+	static vector<int> spiralOrder(vector<vector<int>>& matrix);
+	static vector<vector<int>> generateMatrix(int n);
+
 };
 

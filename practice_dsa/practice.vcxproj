@@ -129,14 +129,25 @@
   <ItemGroup>
     <ClCompile Include="AnswerFromSolution.cpp" />
     <ClCompile Include="Array.cpp" />
+    <ClCompile Include="DynamicPrograming_.cpp" />
+    <ClCompile Include="DynamicProgramming.cpp" />
+    <ClCompile Include="Heaps.cpp" />
     <ClCompile Include="LinkedList.cpp" />
+    <ClCompile Include="N-Queen.cpp" />
     <ClCompile Include="practice.cpp" />
     <ClCompile Include="PracticeString.cpp" />
+    <ClCompile Include="Sudoku.cpp" />
+    <ClCompile Include="Trees.cpp" />
+    <ClCompile Include="Trie.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Array.h" />
+    <ClInclude Include="DynamicProgramming.h" />
+    <ClInclude Include="Heaps.h" />
     <ClInclude Include="LinkedList.h" />
     <ClInclude Include="PracticeString.h" />
+    <ClInclude Include="Trees.h" />
+    <ClInclude Include="Trie.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

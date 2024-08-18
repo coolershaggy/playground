@@ -33,6 +33,8 @@ public:
 	static ListNode* addTwoNumbers(ListNode* l1, ListNode* l2);
 	static ListNode* addTwoNumbersGPT(ListNode* l1, ListNode* l2);
 
+	static ListNode* middleNode(ListNode* head);
+
 
 
 };

@@ -15,6 +15,8 @@ public:
 	static bool checkPalindrome(string& inputString);
 	static string firstPalindrome(vector<string>& words);
 	static char lowerToUppar(char& input);
+	static string upparToLower(string& input);
+	static std::string removeNonAlphanumericAndToLower(std::string& input);
 	static char upparToLower(char& input);
 	static int lengthOfLastWord(string& s);
 	static string reverseString(string inputStr);
@@ -29,6 +31,7 @@ public:
 	static bool checkArrayEqual(int* arr1, int* arr2);
 	static bool checkInclusion(string s1, string s2);
 	static string removeDuplicates(string s);
+	static string longestCommonPrefix(const std::vector<std::string>& strs);
 
 };
 

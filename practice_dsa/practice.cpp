@@ -14,20 +14,10 @@
 //for tree traversal use queue
 #include<queue>
 #include <stack>
-
-
-/**
- * Definition for a binary tree node.
- *  */
- 
-struct TreeNode {
-     int val;
-     TreeNode *left;
-     TreeNode *right;
-     TreeNode() : val(0), left(nullptr), right(nullptr) {}
-     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
-     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
- };
+#include "Trees.h"
+#include "DynamicProgramming.h"
+#include "Trie.h"
+#include "Heaps.cpp"
 
 
 using namespace std;
@@ -35,799 +25,279 @@ using namespace std;
 //note for passing 2D array as argument
 //we need to pass atleast column size in function call. Otherwise complier will give error
 
-bool searchMatrix(vector<vector<int>>& matrix, int target) {
-	int row = matrix.size(); // row size
-	int col = matrix[0].size(); //col size 
-	int start = 0;
-	int end = row*col-1;	//make sure to -1 if starting from 0
-	int mid = start + (end - start) / 2; //to handle case of big numbers addition
-
-	while (start <= end)
-	{
-		//mid is represented by matrix[i][j] -> matrix[mid/col][mid%col]
-		//divide by col gives row number and mod(%) by col gives col number for any element in 2d array
-		if (matrix[mid/col][mid%col] == target) {
-			return true;
-		}
-		else if (target > matrix[mid/col][mid%col]) {
-			start = mid + 1;
-		}
-		else {
-			end = mid - 1;
-		}
-		mid = start + (end - start) / 2;
-	}
-	return false;
-
-}
-
-vector<int> spiralOrder(vector<vector<int>>& matrix) {
-	int m = matrix.size();
-	int n = matrix[0].size();
-	int count = 0;
-	int total = m * n;
-
-	int startRowIndex = 0;
-	int startColIndex = 0;
-	int endColIndex = n - 1;
-	int endRowIndex = m - 1;
-
-	vector<int> answer;
-
-	while (count < total)
-	{
-		//for all loops check this condition before entering in loop "&& count < total"
-
-
-		//print starting row from left to right
-		for (int index = startColIndex; index <= endColIndex && count < total; index++)
-		{
-			answer.push_back(matrix[startRowIndex][index]);
-			count++;
-		}
-		//increment starting row
-		startRowIndex++;
-
-		//print ending col from top to bottom
-		for (int index = startRowIndex; index <= endRowIndex && count < total; index++)
-		{
-			answer.push_back(matrix[index][endColIndex]); 
-			count++;
-		}
-		//decrement ending col
-		endColIndex--;
-
-		//print ending row from right to left
-		for (int index = endColIndex; index >= startColIndex && count < total; index--)
-		{
-			answer.push_back(matrix[endRowIndex][index]);
-			count++;
-		}
-		//decrement ending row
-		endRowIndex--;
-
-		//print starting col from bottom to top
-		for (int index = endRowIndex; index >= startRowIndex && count < total; index--)
-		{
-			answer.push_back(matrix[index][startColIndex]);
-			count++;
-		}
-		//increment starting col
-		startColIndex++;
-
-	}
-	return answer;
-}
-
-vector<vector<int>> generateMatrix(int n) {
-
-	int count = 1;
-	int nSquare = n * n;
-
-	int startRowIndex = 0;
-	int startColIndex = 0;
-	int endColIndex = n - 1;
-	int endRowIndex = n - 1;
-
-
-	vector<vector<int>> matrix(n,vector<int> (n,0));
-
-	while (count <=nSquare)
-	{
-		//for all loops check this condition before entering in loop "&& count < total"
-
-
-		//print starting row from left to right
-		for (int index = startColIndex; index <= endColIndex && count <= nSquare; index++)
-		{
-			matrix[startRowIndex][index] = count;
-			count++;
-		}
-		//increment starting row
-		startRowIndex++;
-
-		//print ending col from top to bottom
-		for (int index = startRowIndex; index <= endRowIndex && count <= nSquare; index++)
-		{
-			matrix[index][endColIndex] = count;
-			count++;
-		}
-		//decrement ending col
-		endColIndex--;
-
-		//print ending row from right to left
-		for (int index = endColIndex; index >= startColIndex && count <= nSquare; index--)
-		{
-			matrix[endRowIndex][index] = count;
-			count++;
-		}
-		//decrement ending row
-		endRowIndex--;
-
-		//print starting col from bottom to top
-		for (int index = endRowIndex; index >= startRowIndex && count <= nSquare; index--)
-		{
-			matrix[index][startColIndex] =count;
-			count++;
-		}
-		//increment starting col
-		startColIndex++;
-
-	}
-	return matrix;
-}
-
-class treeNode {
+class graph
+{
+private:
+	vector<list<int>> adj;
+	int vertices;
+	
 public:
-	int data;
-	treeNode* left;
-	treeNode* right;
-
-	treeNode(int val) {
-		this->data = val;
-		this->left = NULL;
-		this->right = NULL;
+	
+	graph(int num) : vertices(num), adj(num)
+	{
 	}
+	
+	//unordered_map<int, list<int>> adj;
+	
+	list<int> vList;
+	void makeEdge(int u, int v) {
+		//adj[u].push_back(v);
+		
+		adj[u].push_back(v);
+		//adj[v].push_back(u);
+	}
+	void printEdges() {
+		for (int i = 0; i < vertices; i++)
+		{
+			cout <<  "Vertex: " <<i << "-> ";
+			for(int x: adj[i]) {
+				cout << x << ",";
+			}
+			cout << endl;
+
+		}
+	}
+private:
+
 };
 
-TreeNode* buildTree(TreeNode* root) {
-	
-	int val;
-	cin >> val;
-	root = new TreeNode(val);
-	if (val == -1)
+
+//N-Queen with 0 and 1 as representation - START
+
+void addBoardToAns(vector<vector<int>>& answer, vector<vector<int>> &board, int n) {
+	vector<int> temp;
+	for (int i = 0; i < n; i++)
 	{
-		return NULL;
+		for (int j = 0; j < n; i++)
+		{
+			temp.push_back(board[i][j]);
+		}
 	}
-	cout << "Enter for left of " << root->val<< " : " << endl;
-	root->left = buildTree(root->left);
-	cout << "Enter for right:" << root->val << " : " << endl;
-	root->right = buildTree(root->right);
-	return root;
+	answer.push_back(temp);
 }
 
-void levelOrderTreeTraversal(treeNode* root)
-{
-	queue<treeNode*> q;
-	q.push(root);
-	q.push(NULL); //This is separator for level
+bool isSafe(int row, int col, vector<vector<int>>& board, int n) {
+	int x = row;
+	int y = col;
 
-	while (!q.empty())
+	//we are adding queens by columns so we will check only for previously added col position
+
+	//same row
+	while (y >= 0)
 	{
-		treeNode* temp = q.front();	
-		q.pop();
-		if (temp == NULL)	//purana level complete traverse hogaya hai
-		{
-			cout << endl; //print new line when level completes
-			if (!q.empty()) //queue still has child nodes 
-			{
-				q.push(NULL);
-			}
-			//if queue is empty then do nothing. Done printing
+		if (board[x][y] == 1) {
+			return false;
 		}
-		else
-		{
-			cout << temp->data << " "; //print if temp is not null
-			if (temp->left)
-			{
-				q.push(temp->left);
-			}
-			if (temp->right)
-			{
-				q.push(temp->right);
-			}
-		}
+		y--;
 	}
-
-}
-
-void revereseLevelOrderTreeTraversal(treeNode* root)
-{
-	queue<treeNode*> q;
-	q.push(root);
-	q.push(NULL); //This is separator for level
-	vector<vector<int>> ans;
-	vector<int> res;
-	while (!q.empty())
+	//diagonal up
+	while (y >= 0 && x >= 0)
 	{
-		treeNode* temp = q.front();
-		q.pop();
-		if (temp == NULL)	//purana level complete traverse hogaya hai
-		{
-			ans.push_back(res);
-			cout << endl; //print new line when level completes
-			res.clear();
-			if (!q.empty()) //queue still has child nodes 
-			{
-				q.push(NULL);
-			}
-			//if queue is empty then do nothing. Done printing
+		if (board[x][y] == 1) {
+			return false;
 		}
-		else
-		{
-			
-			cout << temp->data << " "; //print if temp is not null
-			res.push_back(temp->data);
-			if (temp->left)
-			{
-				q.push(temp->left);
-			}
-			if (temp->right)
-			{
-				q.push(temp->right);
-			}
-		}
+		y--;
+		x--;
 	}
-}
-
-vector<vector<int>> levelOrder(TreeNode* root) {
-	queue<TreeNode*> q;
-	vector<vector<int>> ans;
-	//this is to check if given tree is empty
-	if (root == NULL) //not giving this condition was giving me Memory execeeded error on LC. So remember this
+	//diagonal down
+	while (y >= 0 && x>n)
 	{
-		return ans;
-	}
-	q.push(root);
-	q.push(NULL); //This is separator for level
-	
-	vector<int> res;
-	while (!q.empty())
-	{
-		TreeNode* temp = q.front();
-		q.pop();
-		if (temp == NULL)	//purana level complete traverse hogaya hai
-		{
-			ans.push_back(res);
-			cout << endl; //print new line when level completes
-			res.clear();
-			if (!q.empty()) //queue still has child nodes 
-			{
-				q.push(NULL);
-			}
-			//if queue is empty then do nothing. Done printing
+		if (board[x][y] == 1) {
+			return false;
 		}
-		else
-		{
-			cout << temp->val << " "; //print if temp is not null
-			
-			if (temp->left)
-			{
-				q.push(temp->left);
-			}
-			if (temp->right)
-			{
-				q.push(temp->right);
-			}
-			res.push_back(temp->val);
-		}
-		
+		y--;
+		x++;
 	}
-	return ans;
+
+	//jar ithe paryant alo mhanje safe aahe
+	return true;
+
 }
 
-
-vector<vector<int>> levelOrderBottom(TreeNode* root) {
-	queue<TreeNode*> q;
-	vector<vector<int>> ans;
-	//this is to check if given tree is empty
-	if (root == NULL) //not giving this condition was giving me Memory execeeded error on LC. So remember this
-	{
-		return ans;
-	}
-	q.push(root);
-	q.push(NULL); //This is separator for level
-
-	vector<int> res;
-	while (!q.empty())
-	{
-		TreeNode* temp = q.front();
-		q.pop();
-		if (temp == NULL)	//purana level complete traverse hogaya hai
-		{
-			ans.push_back(res);
-			cout << endl; //print new line when level completes
-			res.clear();
-			if (!q.empty()) //queue still has child nodes 
-			{
-				q.push(NULL);
-			}
-			//if queue is empty then do nothing. Done printing
-		}
-		else
-		{
-
-			cout << temp->val << " "; //print if temp is not null
-			res.push_back(temp->val);
-			if (temp->left)
-			{
-				q.push(temp->left);
-			}
-			if (temp->right)
-			{
-				q.push(temp->right);
-			}
-		}
-	}
-
-	reverse(ans.begin(), ans.end());
-	return ans;
-}
-
-bool isSameTree(TreeNode* p, TreeNode* q) {
-	if (p == NULL && q != NULL) {
-		return false;
-	}
-	if (p != NULL && q == NULL) {
-		return false;
-	}
-	if (p == NULL && q == NULL) {
-		return true;
-	}
-	//his condition for same tree
-	if (isSameTree(p->left, q->left) && isSameTree(p->right, q->right) && (p->val == q->val)) {
-		return true;
-	}
-	return false;
-}
-
-bool isSameTreeForMirror(TreeNode* p, TreeNode* q) {
-	if (p == NULL && q != NULL) {
-		return false;
-	}
-	if (p != NULL && q == NULL) {
-		return false;
-	}
-	if (p == NULL && q == NULL) {
-		return true;
-	}
-	//tweak this condition for mirror tree
-	if (isSameTreeForMirror(p->left, q->right) && isSameTree(p->right, q->left) && (p->val == q->val)) {
-		return true;
-	}
-	return false;
-}
-bool isSymmetric(TreeNode* root) {
-	if (root->left == NULL && root->right == NULL) {
-		return root;
-	}
-	TreeNode* p = root->left;
-	TreeNode* q = root->right;
-	return isSameTreeForMirror(p, q);
-}
-
-int maxDepth(TreeNode* root) {
+void solveNqueen(int col, vector<vector<int>> &answer, vector<vector<int>> &board, int n) {
 	//base case
-	if (root == NULL)
-	{
-		return 0;
+	if (col == n) {
+		//add current board positions to answer vector
+		addBoardToAns(answer, board, n);
+		return;
 	}
-	//recursive calls
-	
-	int leftHeight = maxDepth(root->left); //on LC storing these in variables results wrong answer
-	int rightHeight = maxDepth(root->right); //on LC storing these in variables results wrong answer
 
-	//processing
-	int answer = max(leftHeight, rightHeight) + 1;
-	
-	//on LC this is how I need to submit. In single line recursive call and removing above left/right height variables
-	//int answer = max(maxDepth(root->left), maxDepth(root->right)) + 1;
-	
+	//solve for one case of first col
+	//go for all rows in first col
+	for (int row = 0; row < n; row++)
+	{
+		//check if its safe to place queen on this column
+		if (isSafe(row, col, board, n)) {
+			board[row][col] = 1;
+			solveNqueen(col + 1, answer, board, n);
+			board[row][col] = 0; //bracktrack if not the right position
+		}
+	}
+
+}
+
+vector<vector<int>> nQueens(int n)
+{
+	//create board, initialize it to N
+	vector<vector<int>> board(n, vector<int>(n,0));
+	vector<vector<int>> answer;
+	//start with Column 0
+	solveNqueen(0, answer, board, n);
 	return answer;
 }
 
+//N-Queen with 0 and 1 as representation - END
 
-//check if tree is balanced or not
-//depth of two subtree of every node never differs by more than one i.e. <=1
-pair<bool, int> isBalancedFast(TreeNode* root) {
+//Sudoku solver --START
 
-	//base case
-	if (root == NULL)
+bool isSafeForSudoku(int row, int col, vector<vector<int>>& board, int val) {
+	for (int i = 0; i < 9; i++)
 	{
-		pair<bool, int> resultPair = make_pair(true, 0);
-		return resultPair;
-	}
-	//recursive calls
-	pair<bool, int> Left = isBalancedFast(root->left);
-	pair<bool, int> Right = isBalancedFast(root->right);
-	//if I dont store these in below vairable I get wrong answer on LC. Not sure why
-	bool lAns = Left.first;
-	bool rAns = Right.first;
-
-	int height = abs(Left.second - Right.second) + 1;// make sure we add this one for calulating height. 
-	
-	bool diff = height <= 1;
-	
-	pair<bool, int> answer;
-	answer.second = max(Left.second, Right.second); //caluclate max height
-	if (lAns && rAns && diff)
-	{
-		answer.first = true;
-	}
-	else {
-		answer.first = false;
-	}
-
-	return answer;
-}
-
-bool isBalanced(TreeNode* root) {
-
-	//base case
-	return isBalancedFast(root).first;
-}
-
-//sum of left leaf nodes
-int sum = 0;
-int sumOfLeftLeaves(TreeNode* root) {
-	if (root == NULL) {
-		return 0;
-	}
-	if (root->left != NULL && root->left->left == NULL && root->left->right == NULL)
-	{
-		sum += root->left->val;
-	}
-	sumOfLeftLeaves(root->left);
-	sumOfLeftLeaves(root->right);
-	return sum;
-}
-
-vector<vector<int>> zigzagLevelOrder(TreeNode* root) {
-	vector<vector<int>> result;
-	
-	bool leftToRight = true;
-	if (root == NULL)
-	{
-		return result;
-	}
-	queue<TreeNode*> queueForLevel;
-	queueForLevel.push(root);
-
-	while (!queueForLevel.empty())
-	{
-		
-		int size = queueForLevel.size();
-		vector<int> answerAtLevel(size);//size is imp for initialization
-
-		for (int i = 0; i < size; i++)
-		{
-			TreeNode* front = queueForLevel.front();
-			queueForLevel.pop();
-			//normal flow or reverse?
-			//we can use different logic as well to reverse this result like reveresing array based on the level/some count
-			int index = (leftToRight) ? i : size - i - 1;
-			answerAtLevel[index] = front->val;
-			
-			if (front->left)
-			{
-				queueForLevel.push(front->left);
-			}
-			if (front->right)
-			{
-				queueForLevel.push(front->right);
-			}
+		//check all columns in row
+		if (board[row][i] == val) {
+			return false;
 		}
-		leftToRight = !leftToRight;
-		result.push_back(answerAtLevel);
+		//check all rows in column
+		if (board[i][col] == val) {
+			return false;
+		}
+		//check 3*3 matrix
+		if (board[row+i/3][col+i%3] == val) {
+			return false;
+		}
 	}
-	return result;
+	return true;
 
 }
 
+bool solveMySudoku(vector<vector<int>>& board) {
+	// size of board. We know its 9 but still
+	int size = board[0].size();
 
-//memorize this. This is classic ex for level order traveral variation
-
-int deepestLeavesSum(TreeNode* root) {
-				vector<int> vec;
-				int result = 0;
-
-				if (root == NULL)
-				{
-					return result;
-				}
-				queue<TreeNode*> levelQueue;
-				levelQueue.push(root);
-
-				while (!levelQueue.empty()) {
-					int size = levelQueue.size();	//calculate size of queue
-					int sumAtLevel = 0;	//initilize level wise operation
-
-					//do processing for items in queue and push next childs
-					for (int i = 0; i < size; i++) {	//make sure this loop is till size and not size-1
-						TreeNode* temp = levelQueue.front();	//get first element of queue
-						//pop front of queue
-						levelQueue.pop();
-
-						//here we are calculation sum at each level
-						sumAtLevel += temp->val;
-
-						//check if current node(temp) has any left or right leaf. If yes, then push in queue for processing
-						if (temp->left)
-						{
-							levelQueue.push(temp->left);
+	for (int row = 0; row < size; row++)
+	{
+		for (int col = 0; col < size; col++)
+		{
+			//0 means position is empty and we can start solving it for 0
+			if (board[row][col] == 0) {
+				for (int val = 1; val < 10; val++) {
+					if (isSafeForSudoku(row, col, board, val)) {
+						board[row][col] = val;
+						bool nextPossibleSolution = solveMySudoku(board);
+						if (nextPossibleSolution) {
+							return true;
 						}
-						if (temp->right)
+						else
 						{
-							levelQueue.push(temp->right);
+							board[row][col] = 0;
 						}
 					}
-					//here one level is traversed. Current level results can be used for answer
-
-					vec.push_back(sumAtLevel);
 				}
-				//last value pushed in vector will be sum of last level. Which is our answer
-				result= vec.back();
-				return result;
-}
-
-//IMP below
-//Path Sum II
-//here I am passing path as pass by reference(&) so single copy is made. Need to pop it everytime result is not found
-//i can avoid that by passing pass by value as well and removing call for pop
-void solvePathSum(TreeNode* root, int targetSum, vector<int>& path, vector<vector<int>>& answer) {
-	if (root == NULL) {
-		return;
-	}
-	path.push_back(root->val);
-
-	//base case
-	//on leaf node we need to check if updated targetSum minus that node value is 0 or not.
-	//if it is zero then we can recursively check pervious nodes if they add up to targetSum
-	if (root->left == NULL && root->right == NULL && (targetSum - root->val == 0)) {
-		answer.push_back(path);
-	}
-	solvePathSum(root->left, targetSum - root->val, path, answer);
-	solvePathSum(root->right, targetSum - root->val, path, answer);
-	path.pop_back(); //only in case of if pass by reference is used
-}
-vector<vector<int>> pathSum(TreeNode* root, int targetSum) {
-	vector<vector<int>> answer;
-	vector<int> path;
-	solvePathSum(root, targetSum, path, answer);
-	return answer;
-}
-
-//437. Path Sum III
-void solvePathSumIII(TreeNode* root, int targetSum, vector<int> path, int& count) {
-	long long sum = 0;
-	if (root == NULL) {
-		return;
-	}
-	path.push_back(root->val);
-	solvePathSumIII(root->left, targetSum, path, count);
-	solvePathSumIII(root->right, targetSum, path, count);
-	int size = path.size();
-	//start from end of vector as that has most recent node and we need sum from any node
-	for (int i = size - 1; i >= 0; i--) {
-		sum += path[i];
-		if (sum == targetSum) {
-			count++;
-		}
-	}
-}
-int pathSumIII(TreeNode* root, int targetSum) {
-	int count = 0;
-	vector<int> path;
-	solvePathSumIII(root, targetSum, path, count);
-	return count;
-}
-
-//1161. Maximum Level Sum of a Binary Tree
-int maxLevelSum(TreeNode* root) {
-	int answer = 0;
-	pair<int, int> myPair;
-	vector<pair<int, int>> vec;
-	if (root == NULL) {
-		return 0;
-	}
-	queue<TreeNode*> q;
-	q.push(root);
-	int level = 1;
-	while (!q.empty()) {
-		int size = q.size();
-		int levelSum = 0;
-		for (int i = 0; i < size; i++) {  //make sure this loop is till size and not size-1
-			TreeNode* temp = q.front();
-			q.pop();
-			levelSum += temp->val;
-			if (temp->left)
-			{
-				q.push(temp->left);
-			}
-			if (temp->right)
-			{
-				q.push(temp->right);
-			}
-		}
-		myPair = make_pair(levelSum, level);
-		vec.push_back(myPair);
-		level++;    //make sure to increment level
-	}
-	//using custom sort expression for pair to sort with first value of pair where my levelSum is.
-	sort(vec.begin(), vec.end(), [](pair<int, int>& a, pair<int, int>& b) {return a.first > b.first; });
-	//returing level which is at second of pair for largest sum
-	return vec[0].second;
-}
-
-//2583. Kth Largest Sum in a Binary Tree
-long long kthLargestLevelSum(TreeNode* root, int k) {
-	long long answer = 0;
-	vector<long long> vec;
-	if (root == NULL) {
-		return NULL;
-	}
-	queue<TreeNode*> q;
-	q.push(root);
-
-	while (!q.empty()) {
-		int size = q.size();
-		long long levelSum = 0;
-		for (int i = 0; i < size; i++) {  //make sure this loop is till size and not size-1
-			TreeNode* temp = q.front();
-			q.pop();
-			levelSum += temp->val;
-			if (temp->left)
-			{
-				q.push(temp->left);
-			}
-			if (temp->right)
-			{
-				q.push(temp->right);
-			}
-		}
-		vec.push_back(levelSum);
-	}
-	sort(vec.rbegin(), vec.rend());
-	if (vec.size() < k) {
-		return -1;
-	}
-	return vec[k - 1];
-}
-
-//199. Binary Tree Right Side View
-vector<int> rightSideView(TreeNode* root) {
-	vector<int> answer;
-	if (!root) {
-		return answer;
-	}
-	queue<TreeNode*> levelQueue;
-	levelQueue.push(root);
-
-	while (!levelQueue.empty()) {
-		int size = levelQueue.size();
-		for (int i = 0; i < size; i++) {
-			TreeNode* temp = levelQueue.front();
-			levelQueue.pop();
-			//last element in queue
-			if (i == size - 1) {
-				answer.push_back(temp->val);
-			}
-			if (temp->left) {
-				levelQueue.push(temp->left);
-			}
-			if (temp->right) {
-				levelQueue.push(temp->right);
+				return false;
 			}
 		}
 	}
-	return answer;
+	return true;
 }
 
-//1302. Deepest Leaves Sum
-int deepestLeavesSum(TreeNode* root) {
-	vector<int> vec;
-	int result = 0;
+void solveSudoku(vector<vector<int>>& board) {
+	bool canWeSolveIt = solveMySudoku(board);
+}
 
-	if (root == NULL)
-	{
-		return result;
+bool isSafeForSudokuGPT(int row, int col, vector<vector<char>>& board, char val) {
+	int n = board.size(); // Assuming the board is n x n and n is a perfect square.
+	int subgridSize = sqrt(n); // Size of the small square, typically 3 for a 9x9 Sudoku.
+	int startRow = row - row % subgridSize; // Starting index of the small square's row.
+	int startCol = col - col % subgridSize; // Starting index of the small square's column.
+
+	for (int i = 0; i < n; i++) {
+		// Check all columns in the row
+		if (board[row][i] == val) {
+			return false;
+		}
+		// Check all rows in the column
+		if (board[i][col] == val) {
+			return false;
+		}
 	}
-	queue<TreeNode*> levelQueue;
-	levelQueue.push(root);
-
-	while (!levelQueue.empty()) {
-		int size = levelQueue.size();	//calculate size of queue
-		int sumAtLevel = 0;	//initilize level wise operation
-
-		//do processing for items in queue and push next childs
-		for (int i = 0; i < size; i++) {
-			TreeNode* temp = levelQueue.front();	//get first element of queue
-			//pop front of queue
-			levelQueue.pop();
-
-			//here we are calculation sum at each level
-			sumAtLevel += temp->val;
-
-			//check if current node(temp) has any left or right leaf. If yes, then push in queue for processing
-			if (temp->left)
-			{
-				levelQueue.push(temp->left);
-			}
-			if (temp->right)
-			{
-				levelQueue.push(temp->right);
+	// Check the 3x3 subgrid
+	for (int i = 0; i < subgridSize; i++) {
+		for (int j = 0; j < subgridSize; j++) {
+			if (board[startRow + i][startCol + j] == val) {
+				return false;
 			}
 		}
-		//here one level is traversed. Current level results can be used for answer
-
-		vec.push_back(sumAtLevel);
 	}
-	//last value pushed in vector will be sum of last level. Which is our answer
-	result = vec.back();
-	return result;
+	return true;
 }
 
-//623. Add One Row to Tree
-TreeNode* addOneRow(TreeNode* root, int val, int depth) {
-	if (depth == 1) {
-		TreeNode* newNode = new TreeNode(val);
-		newNode->left = root;
-		root = newNode;
-	}
-	queue<TreeNode*> q;
-	q.push(root);
-	int level = 0;
-	while (!q.empty()) {
-		level++;
-		int size = q.size();
-		//break one level before where we want to insert level
-		if (level == depth - 1) break;
+//Sudoku solver --END
 
-		for (int i = 0; i < size; i++) {
-			TreeNode* temp = q.front();
-			q.pop();
-			if (temp->left) {
-				q.push(temp->left);
-			}
-			if (temp->right) {
-				q.push(temp->right);
-			}
-		}
 
-	}
-	//now we insert new level with val here
-	//get remaining items in the queue which hold remaining tree
-	int size_after_break = q.size();
-	while (size_after_break--) {
-		TreeNode* current = q.front();
-		q.pop();
-		//creating new nodes with given val
-		//this new node will be added to left and right of current node
-		TreeNode* newLeft = new TreeNode(val);
-		TreeNode* newRight = new TreeNode(val);
-		newLeft->left = current->left;
-		current->left = newLeft;    //current chya left madhe newleft
 
-		newRight->right = current->right;
-		current->right = newRight; //cuurent chya right madhe new right
 
-	}
-	//return root
-	return root;
-}
 
 int main()
 {
+	vector<int> nums = { 7, 10, 4, 3, 20, 15,1 };
+	cout << DP::maximumNonAdjacentSum(nums) << endl;
+
+	//trie
+
+	Trie* t = new Trie();
+	t->insert("hello");
+	t->insert("world");
+	cout << "Present or not: " << t->searchWord("hello") << endl;
+
+	priorityQ();
+	//vector<int> nums = { 7, 10, 4, 3, 20, 15,1 };
+	//int k = 3;
+	//kthSmallest(nums,k);
+
+	//std::string word = "Hello World";
+	//for (int i = 0; i < word.length(); i++)
+	//{
+	//	std::string sub = word.substr(i); // "ello"
+	//	std::cout << sub << std::endl; // Outputs: ello
+	//}
+	
+
+
+	//ListNode* firstNode = new ListNode(10);
+	//ListNode* head = firstNode;
+	//ListNode* tail = firstNode;
+	//LinkedList::insertAtTail(tail, 1);
+
+	//LinkedList::insertAtTail(tail, 13);
+
+	//LinkedList::insertAtTail(tail, 6);
+
+	//LinkedList::insertAtTail(tail, 9);
+
+	//LinkedList::insertAtTail(tail, 5);
+
+	//LinkedList::print(head);
+
+	//ListNode* list2 = new ListNode(1000000);
+	//ListNode* headL2 = list2;
+	//ListNode* tailL2 = list2;
+	//LinkedList::insertAtTail(tailL2, 1000001);
+	//LinkedList::insertAtTail(tailL2, 1000002);
+
+	//LinkedList::print(headL2);
+
+	//mergeInBetween(firstNode, 3,4, list2);
+	//LinkedList::print(head);
+
+	//---------------------------------------
+
+	//vector<int> nums = { 4,2,2,3 };
+
+	//cout << twinSum(nums);
+	// 
+	//cout << maximumNonAdjacentSum(nums);
+	//------------------------------------------------------------
+	
 	//find peak of mountain
 	/*
 	vector<int> vec = {0,10,5,2};
@@ -936,9 +406,9 @@ int main()
 
 	//char input = 's';
 	//cout << lowerToUppar(input);
-	//char temp = 'Z';
-	//cout << upparToLower(temp);
-
+	//string temp = "123A man, a plan, a canal: Panama";
+	//cout << PracticeString::upparToLower(temp) << endl;
+	//cout << PracticeString::removeNonAlphanumericAndToLower(temp) << endl;
 	//vector<int> target = { 1,2,3,4 };
 	//vector<int> arr = { 1,2,3,7 };
 	//cout << canBeEqual(target, arr);
@@ -1106,16 +576,16 @@ int main()
 	//create your own class node for Linked List, Tree, etc
 	
 	//trees
-	TreeNode* myroot = NULL;
+	//TreeNode* myroot = NULL;
 	//input for copy paste
 	//1 3 7 -1 -1 11 -1 -1 5 17 -1 -1 -1
 	//3 9 -1 -1 20 15 -1 -1 7 -1 -1 
 	//1 2 4 -1 -1 5 6 -1 -1 7 -1 -1 3 -1 -1
-	myroot = buildTree(myroot);
+	//myroot = Trees::buildTree(myroot);
 	//levelOrderTreeTraversal(myroot);
 	//revereseLevelOrderTreeTraversal(root);
 	
-	vector<vector<int>> res = levelOrder(myroot);
+	//vector<vector<int>> res = levelOrder(myroot);
 	//vector<vector<int>> res = levelOrderBottom(myroot);
 
 	//height of binary tree
@@ -1123,7 +593,7 @@ int main()
 	//cout << "height/depth: " << height;
 
 	//useful for getting height in other traversal. optimized for other problems
-	pair<int, int> mypair  = make_pair(12,99);
+	//pair<int, int> mypair  = make_pair(12,99);
 	//cout << mypair.first << " " << mypair.second << endl;
 	
 	//sum tree -> check where it is on LC
@@ -1147,7 +617,88 @@ int main()
 	- Diagonal Traversal:https://practice.geeksforgeeks.org/pr...
 	*/
 
-	zigzagLevelOrder(myroot);
+	//zigzagLevelOrder(myroot);
+
+	//BST started from here
+
+	//Inorder predecesor and sucsessor for Binary Tree
+
+	//(Done) Validate BST : https://www.codingninjas.com/codestud...
+	//(Done)Kth Smallest / Largest in BST : https://www.codingninjas.com/codestud...
+	//(Done)LCA in BST : https://www.codingninjas.com/codestud...
+	//-Inorder Predecessor / Successor : https ://www.codingninjas.com/codestud...
+	//for this traverse the tree in inorder way and store it in array/vec. for given key, predecessor will be key-1 and successor will key+1
+	//this can be optimized for space by using pair<predecessor, successor>
+
+	//TODO: Trees and Binary Trees
+	/*
+	//Inorder predecesor and sucsessor for Binary Tree
+	//-Boundary Traversal : https://practice.geeksforgeeks.org/pr...
+	//-Vertical Order Traversal : https://practice.geeksforgeeks.org/pr...
+	//-Top View : https://practice.geeksforgeeks.org/pr...
+	//-Bottom View : https://practice.geeksforgeeks.org/pr...
+	//-Right View : https://practice.geeksforgeeks.org/pr...
+	//-Left View : https://practice.geeksforgeeks.org/pr...
+	//-Diagonal Traversal : https://practice.geeksforgeeks.org/pr...
+
+	*/
+	//IMP Try once
+	//- Largest BST Subtree: https://www.codingninjas.com/codestud...
+
+
+	// backtracking
+	/*vector<vector<string>> answer = { {"X..."},{".Y.."} };
+	vector<string> temp;
+	temp.push_back("A");
+	temp.push_back("A");
+	temp.push_back("A");
+	temp.push_back("A");
+	answer.push_back(temp);
+	string s1 = answer[0][0];
+	string s2 = answer[1][0];
+	string s3 = answer[2][0];*/
+
+	//answer for above situation required in N-Queen problem
+	//use temp string to store values and push that string
+	/*
+	void addBoardToAns(vector<vector<string>>& answer, vector<vector<string>>& board, int n) {
+		vector<string> temp;
+		for (int i = 0; i < n; i++) {
+			string row;
+			for (int j = 0; j < n; j++) {
+				row += board[i][j]; // Concatenate the characters of the row
+			}
+			temp.push_back(row); // Add the concatenated row string to the temp vector
+		}
+		answer.push_back(temp); // Add the temp vector representing the board to the answer
+	}
+	*/
+	
+	//cout << endl;
+
+
+	//Graphs
+	//graph g(5);
+	//g.makeEdge(0, 1);
+	//g.makeEdge(0, 2);
+	//g.makeEdge(1, 0);
+	//g.makeEdge(1, 2);
+	//g.makeEdge(1, 3);
+	//g.makeEdge(2, 0);
+	//g.makeEdge(2, 1);
+	//g.makeEdge(3, 1);
+
+	//g.makeEdge(0,1);
+	//g.makeEdge(0,2);
+	//g.makeEdge(2,1);
+	//g.makeEdge(1,3);
+
+	//g.makeEdge(0, 1);
+	//g.makeEdge(1, 3);
+	//g.makeEdge(0, 2);
+	//g.makeEdge(2, 4);
+
+	//g.printEdges();
 }
 
 
